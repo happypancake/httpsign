@@ -1,0 +1,12 @@
+{application, http_signatures,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { http_signatures_app, []}},
+  {env, []}
+ ]}.
