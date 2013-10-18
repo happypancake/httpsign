@@ -32,14 +32,11 @@ init([]) ->
 handle_call({set_key,{Id, Algo, Data}}, _From, Keys) ->
   NewKeys = lists:keystore(Id, 1, Keys, {Id, Algo, Data}),
   {reply, ok, NewKeys};
-
 handle_call({get_authorization, {ARequest, KeyId, Fields}}, _From, Keys) ->
-  {_, Headers, _} = parse_request(ARequest),
-  Key = lists:keyfind(KeyId, 1, Keys),
-  {Algo, Signature} = generate_signature(Key, Headers, Fields),
-  Hash = base64:encode(Signature),
-  Result = build_authorization_string(KeyId, Algo, Hash),
-  {reply, Result, Keys}.
+  Result = get_signature(ARequest, KeyId, Fields, Keys),
+  {reply, Result, Keys};
+handle_call({validate_response,_}, _From, Keys) ->
+  {reply, not_implemented, Keys}.
 
 handle_cast(_Msg, State) ->
   {noreply, State}.
@@ -57,12 +54,19 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal Function Definitions
 %% ------------------------------------------------------------------
 
+get_signature(ARequest, KeyId, Fields, Keys) ->
+  {Headers, _} = parse_request(ARequest),
+  Key = lists:keyfind(KeyId, 1, Keys),
+  {Algo, Signature} = generate_signature(Key, Headers, Fields),
+  Hash = base64:encode(Signature),
+  build_authorization_string(KeyId, Algo, Hash).
+
 parse_request(ARequest) ->
   [RequestLine,From2] = binary:split(ARequest,<<"\n">>),
   [HeaderText,Body] = binary:split(From2,<<"\n\n">>),
   HeaderLines = binary:split(HeaderText,<<"\n">>,[global]),
   Headers = lists:map(fun line_to_header_tuple/1,HeaderLines),
-  {RequestLine, Headers, Body}.
+  {[{"request-line",RequestLine}|Headers], Body}.
 
 line_to_header_tuple(Line) ->
   [UnicodeKey,Value] = binary:split(Line, <<": ">>),
