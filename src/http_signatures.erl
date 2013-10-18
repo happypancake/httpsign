@@ -1,8 +1,10 @@
 -module(http_signatures).
+-export([get_authorization/2,register_key/3]).
 
 -define(SERVER,http_signatures_server).
 
--export([get_authentication_header/1]).
+register_key(Name, Algorithm, KeyData) ->
+  gen_server:call(?SERVER, {set_key, {Name, Algorithm, KeyData}}).
 
-get_authentication_header(AHeader) ->
-  gen_server:call({get_header, AHeader}).
+get_authorization(ARequest, KeyId) ->
+  gen_server:call(?SERVER, {get_authorization, {ARequest, KeyId, ["date"]}}).

@@ -3,7 +3,7 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/1]).
+-export([start_link/0]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -15,16 +15,16 @@
 %% API functions
 %% ===================================================================
 
-start_link([KeyGetter]) ->
-  supervisor:start_link({local, ?MODULE}, ?MODULE, [KeyGetter]).
+start_link() ->
+  supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 %% ===================================================================
 %% Supervisor callbacks
 %% ===================================================================
 
-init([KeyGetter]) ->
+init([]) ->
 
   {ok, { {one_for_one, 5, 10}, [
-        ?CHILD(http_signatures_server, worker, [KeyGetter])
+        ?CHILD(http_signatures_server, worker, [])
         ]} }.
 

@@ -9,8 +9,8 @@
 %% Application callbacks
 %% ===================================================================
 
-start(_StartType, KeyGetter) ->
-  http_signatures_sup:start_link([KeyGetter]).
+start(_StartType, _) ->
+  http_signatures_sup:start_link().
 
 stop(_State) ->
   ok.
