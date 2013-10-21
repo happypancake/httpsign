@@ -5,7 +5,9 @@ implementation for Erlang.
 
 Currently only implements `sha256`.
 
+## Documentation
 
+[Online here](http://happypancake.github.io/http_signatures/http_signatures.html)
 
 ## Usage
 ```erlang

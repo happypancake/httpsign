@@ -8,7 +8,7 @@
 %
 % See <a href="http://tools.ietf.org/html/draft-cavage-http-signatures-00">the http signature draft</a> for more information.
 % @reference License: <a href="https://raw.github.com/HappyPancake/http_signatures/master/LICENSE">Apache 2.0</a>.
-%
+% @reference Source: <a href="https://github.com/HappyPancake/http_signatures">GitHub</a>.
 % @end
 
 -module(http_signatures).
