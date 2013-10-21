@@ -35,9 +35,6 @@ handle_call({set_key,{Id, Algo=sha256, Data}}, _From, Keys) ->
       lists:map(fun public_key:pem_entry_decode/1, PemEntries),
   NewKeys = lists:keystore(Id, 1, Keys, {Id, Algo, PrivateKey}),
   {reply, ok, NewKeys};
-handle_call({get_authorization, {ARequest, KeyId, Fields}}, _From, Keys) ->
-  Result = get_signature(ARequest, KeyId, Fields, Keys),
-  {reply, Result, Keys};
 handle_call({sign_response,{Response, KeyId, Fields}}, _from, Keys) ->
   Auth = get_signature(Response,KeyId,Fields,Keys),
   Result = insert_authorization_in_response(Response,Auth),
@@ -109,7 +106,7 @@ parse_signature_value(_DontCare, Result) ->
   Result.
 
 parse_field_info({<<"headers">>,FieldInfo}) ->
-  Splitted = binary:split(FieldInfo,<<" ">>),
+  Splitted = binary:split(FieldInfo,<<" ">>,[global]),
   Fields = lists:map(fun binary_to_list/1, Splitted),
   lists:map(fun string:to_lower/1, Fields).
 
