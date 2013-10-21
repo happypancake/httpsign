@@ -1,6 +1,5 @@
 % @doc Apply the Http signature protocol to web requests.
 %
-% Written by <a href="http://www.happypancake.com">Happy Pancake</a>.
 %
 % This is a way to add origin authentication, message
 % integrity, and replay resistance to HTTP requests.  It is intended to
@@ -45,7 +44,7 @@
 %   11> 
 % '''
 %
-
+% @reference Written by: <a href="http://www.happypancake.com">Happy Pancake</a>.
 % @reference License: <a href="https://raw.github.com/HappyPancake/http_signatures/master/LICENSE">Apache 2.0</a>.
 % @reference Source: <a href="https://github.com/HappyPancake/http_signatures">GitHub</a>.
 % @end
