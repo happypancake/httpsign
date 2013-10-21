@@ -5,6 +5,9 @@
 
 -define(SERVER,http_signatures_server).
 
+register_key(Name, Algorithm, KeyFileName) when is_list(KeyFileName) ->
+  {ok, KeyData} = file:read_file(KeyFileName),
+  register_key(Name, Algorithm, KeyData);
 register_key(Name, Algorithm, KeyData) ->
   gen_server:call(?SERVER, {set_key, {Name, Algorithm, KeyData}}).
 
