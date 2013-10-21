@@ -23,9 +23,9 @@
 -type response_type() :: binary().
 -type header_name() :: list(). % Lowercase
 
-%% @doc Register a key by defining it's PEM file and the algorithm used.
-%% If the last parameter is a binary, this will be considered as the 
-%% content of the PEM-file. If it is a list, this will be assumed to be 
+%% @doc Register a `KeyId' by defining it's `PEM file' and the `algorithm' used.
+%% If the last parameter is a `binary', this will be considered as the 
+%% content of the PEM-file. If it is a `list', this will be assumed to be 
 %% a filename, and the content will be read from a file with this filename.
 -spec register_key(key_id_type(), algo_type(), filename_type()|binary()) -> 'ok'.
 %% @end
@@ -35,27 +35,30 @@ register_key(Name, Algorithm, KeyFileName) when is_list(KeyFileName) ->
 register_key(Name, Algorithm, KeyData) ->
   gen_server:call(?SERVER, {set_key, {Name, Algorithm, KeyData}}).
 
-%% @doc Sign a response using the KeyId and the "date" header from the response.
+%% @doc Sign a response using the `KeyId' and the `"date"' header from the `response'.
 %% This returns a signed response.
 -spec get_signed_response(response_type(), key_id_type()) -> response_type().
 %% @end
 get_signed_response(Response, KeyId) ->
   get_signed_response(Response, KeyId, ["date"]).
 
-%% @doc Sign a response using the KeyId and the defined headers from the response.
-%% The headers must be in lowercase list format, for example:
+%% @doc Sign a `response' using the `KeyId' and the `defined headers' from 
+%% the response.
+%%
+%% The `headers' must be in `lowercase list' format, for example:
 %%    
 %%   <code>get_signed_response(AResponse, AKey, ["date","host","content-type"])</code>
 %%
-%% The headers must exist in the response!
+%% The `headers' must exist in the `response'!
 %% This returns a signed response.
 -spec get_signed_response(response_type(), key_id_type(),[header_name()]) -> response_type().
 %% @end
 get_signed_response(Response, KeyId, Fields) ->
   gen_server:call(?SERVER, {sign_response, {Response, KeyId, Fields }}).
 
-%% @doc Returns true when the response is signed and valid, false otherwise.
-%% It extracts the key from the authentication header.
+%% @doc Returns `true' when the `response' is signed with a known `KeyId', 
+%% and the signature is valid, `false' otherwise.
+%% It extracts the `KeyId' from the `authentication' header.
 -spec is_signed_response(response_type()) -> boolean().
 %% @end
 is_signed_response(Response) ->
