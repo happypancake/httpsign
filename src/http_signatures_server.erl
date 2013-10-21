@@ -121,7 +121,7 @@ generate_signature({_KeyId, Algo, PrivateKey}, Headers, Fields) ->
   {Algo, Signature}.
 
 build_authorization_string(KeyId, Algo, Hash, Fields) ->  
-  bjoin([<<"Signature keyId=\"">>, KeyId, 
+  iolist_to_binary([<<"Signature keyId=\"">>, KeyId, 
          <<"\",algorithm=\"">>, external_algo_name(Algo), 
          <<"\",headers=\"">>, build_fields(Fields),
          <<"\",signature=\"">>, Hash,  
@@ -134,16 +134,12 @@ get_fields(Headers,Fields) ->
   get_fields(Headers, Fields, []).
 
 get_fields(_Headers, [], Acc) ->
-  Bin = bjoin(Acc),
+  Bin = iolist_to_binary(Acc),
   binary:part(Bin,0, byte_size(Bin)-1);
 get_fields(Headers, [H|T], Acc) ->
   {H, Value} = lists:keyfind(H,1,Headers),
   ToAdd = [list_to_binary(H),<<": ">>,Value,<<"\n">>],
   get_fields(Headers, T, [Acc| ToAdd]).
-
-bjoin(List) ->
-  F = fun(A, B) -> <<A/binary, B/binary>> end,
-  lists:foldr(F, <<>>, lists:flatten(List)).
 
 insert_authorization_in_response(Response, Authorization) ->
   [Pre,Post] = binary:split(remove_authorization(Response), <<"\n\n">>),
