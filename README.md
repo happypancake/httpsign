@@ -7,7 +7,7 @@ Currently only implements `sha256`.
 
 ## Documentation
 
-[Online here](http://happypancake.github.io/http_signatures/http_signatures.html)
+[Online here](http://happypancake.github.io/http_signatures/)
 
 ## Usage
 ```erlang
