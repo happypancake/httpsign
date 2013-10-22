@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Module httpsign</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module httpsign</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Apply the Http signature protocol to web requests.
+
+<p><b>References</b><ul><li>Written by: <a href="http://www.happypancake.com">Happy Pancake</a>.</li><li>License: <a href="https://raw.github.com/HappyPancake/httpsign/master/LICENSE">Apache 2.0</a>.</li><li>Source: <a href="https://github.com/HappyPancake/httpsign">GitHub</a>.</li></ul></p>
+
+<h2><a name="description">Description</a></h2><p>Apply the Http signature protocol to web requests.</p>
+
+
+ <p>This is a way to add origin authentication, message 
+integrity, and replay resistance to HTTP requests.  It is intended to  
+be used over the HTTPS protocol.</p>
+
+ <p>It does this by adding an <code>Authorization</code> header to the response. If it exists, 
+it gets replaced.</p>
+
+ <p>This header contains a <code>KeyId</code>, the algorithm used to calculate a signature, 
+a list of the headers used to calculate the signature, and the signature in 
+itself.</p>
+
+ <p>Check <a href="http://tools.ietf.org/html/draft-cavage-http-signatures-00">the http signature draft</a> for more information.</p>
+
+ <h3><a name="An_example_using_the_CLI">An example using the CLI</a></h3>
+
+ <pre>   tojans@ubuntu:/mnt/hgfs/develop/erlang/httpsign$ erl -pa ebin
+   Erlang R16B02 (erts-5.10.3) [source-5d89ddd] [64-bit] [async-threads:10] [kernel-poll:false]
+
+   Eshell V5.10.3  (abort with ^G)
+   1&gt; application:start(httpsign).
+   ok
+   2&gt; {ok, PemFile} = file:read_file("priv/fixtures/test.pem").
+   {ok,&lt;&lt;"-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDCFENGw33yGihy92pDjZQhl0C3\n6rPJj+CvfSC8+q28"...&gt;&gt;}
+   3&gt; KeyId = &lt;&lt;"Test"&gt;&gt;.
+   &lt;&lt;"Test"&gt;&gt;
+   4&gt; httpsign:register_key(KeyId, sha256, PemFile).
+   ok
+   5&gt; {ok, Resp} = file:read_file("priv/fixtures/example_response.txt").
+   {ok,&lt;&lt;"POST /foo?param=value&amp;pet=dog HTTP/1.1\nHost: example.com\nDate: Thu, 05 Jan 2012 21:31:40 GMT\nContent-Type: a"...&gt;&gt;}
+   6&gt; httpsign:is_signed_response(Resp).
+   false
+   7&gt; SignedResp = httpsign:get_signed_response(Resp,KeyId).
+   &lt;&lt;"POST /foo?param=value&amp;pet=dog HTTP/1.1\nHost: example.com\nDate: Thu, 05 Jan 2012 21:31:40 GMT\nContent-Type: applicati"...&gt;&gt;
+   8&gt; httpsign:is_signed_response(SignedResp).
+   true
+   9&gt; AlteredResp = binary:replace(SignedResp, &lt;&lt;"Thu, 05 Jan"&gt;&gt;,&lt;&lt;"Thu, 06 Jan"&gt;&gt;).
+   &lt;&lt;"POST /foo?param=value&amp;pet=dog HTTP/1.1\nHost: example.com\nDate: Thu, 06 Jan 2012 21:31:40 GMT\nContent-Type: applicati"...&gt;&gt;
+   10&gt; httpsign:is_signed_response(AlteredResp).
+   false
+   11&gt;</pre>
+
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-algo_type">algo_type()</a></h3>
+<p><tt>algo_type() = sha256</tt></p>
+
+
+<h3 class="typedecl"><a name="type-filename_type">filename_type()</a></h3>
+<p><tt>filename_type() = list()</tt></p>
+
+
+<h3 class="typedecl"><a name="type-header_name">header_name()</a></h3>
+<p><tt>header_name() = list()</tt></p>
+<p> Lowercase</p>
+
+<h3 class="typedecl"><a name="type-key_id_type">key_id_type()</a></h3>
+<p><tt>key_id_type() = binary()</tt></p>
+
+
+<h3 class="typedecl"><a name="type-response_type">response_type()</a></h3>
+<p><tt>response_type() = binary()</tt></p>
+
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#get_signed_response-2">get_signed_response/2</a></td><td>Add or replace an <code>Authorization</code> header in a <code>HTTP response</code> using
+  only the <code>date</code> header to sign the response.</td></tr>
+<tr><td valign="top"><a href="#get_signed_response-3">get_signed_response/3</a></td><td>Add or replace an <code>Authorization</code> header in a <code>HTTP response</code> using  
+user-defined headers to sign the response.</td></tr>
+<tr><td valign="top"><a href="#is_signed_response-1">is_signed_response/1</a></td><td>Returns <code>true</code> when the <code>HTTP response</code> is contains an <code>authorization</code>
+  header  with a known <code>KeyId</code> and a valid signature, <code>false</code> otherwise.</td></tr>
+<tr><td valign="top"><a href="#register_key-3">register_key/3</a></td><td>Register a <code>KeyId</code> by defining it's <code>PEM file</code> and the <code>algorithm</code> used.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="get_signed_response-2">get_signed_response/2</a></h3>
+<div class="spec">
+<p><tt>get_signed_response(Response::<a href="#type-response_type">response_type()</a>, KeyId::<a href="#type-key_id_type">key_id_type()</a>) -&gt; <a href="#type-response_type">response_type()</a></tt><br></p>
+</div><p><p>Add or replace an <code>Authorization</code> header in a <code>HTTP response</code> using
+  only the <code>date</code> header to sign the response.</p>
+ 
+  Use the <code>"date"</code> header from the <code>response</code> as input, and sign it
+  using the <code>KeyId</code>.</p>
+
+<h3 class="function"><a name="get_signed_response-3">get_signed_response/3</a></h3>
+<div class="spec">
+<p><tt>get_signed_response(Response::<a href="#type-response_type">response_type()</a>, KeyId::<a href="#type-key_id_type">key_id_type()</a>, Fields::[<a href="#type-header_name">header_name()</a>]) -&gt; <a href="#type-response_type">response_type()</a></tt><br></p>
+</div><p><p>Add or replace an <code>Authorization</code> header in a <code>HTTP response</code> using  
+user-defined headers to sign the response.</p>
+ 
+  <p>Use the <code>defined headers</code> from the <code>response</code> to select the headers that
+  will be used to build the input for the signature, and sign it using the
+  <code>KeyId</code>.</p>
+ 
+  <p>The <code>defined headers</code> are a list of lowercase strings containing header names.</p>
+ 
+   <p><code>get_signed_response(AResponse, AKey, ["date","host","content-type"])</code></p>
+ 
+  The <code>headers</code> must exist in the <code>response</code>!</p>
+
+<h3 class="function"><a name="is_signed_response-1">is_signed_response/1</a></h3>
+<div class="spec">
+<p><tt>is_signed_response(Response::<a href="#type-response_type">response_type()</a>) -&gt; boolean()</tt><br></p>
+</div><p>Returns <code>true</code> when the <code>HTTP response</code> is contains an <code>authorization</code>
+  header  with a known <code>KeyId</code> and a valid signature, <code>false</code> otherwise.</p>
+
+<h3 class="function"><a name="register_key-3">register_key/3</a></h3>
+<div class="spec">
+<p><tt>register_key(Name::<a href="#type-key_id_type">key_id_type()</a>, Algorithm::<a href="#type-algo_type">algo_type()</a>, KeyFileName::<a href="#type-filename_type">filename_type()</a> | binary()) -&gt; ok</tt><br></p>
+</div><p>Register a <code>KeyId</code> by defining it's <code>PEM file</code> and the <code>algorithm</code> used.
+  If the last parameter is a <code>binary</code>, this will be considered as the
+  content of the PEM-file. If it is a <code>list</code>, this will be assumed to be
+  a filename, and the content will be read from a file with this filename.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Oct 22 2013, 00:23:33.</i></p>
+</body>
+</html>
