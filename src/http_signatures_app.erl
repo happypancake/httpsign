@@ -1,3 +1,4 @@
+% @private
 -module(http_signatures_app).
 
 -behaviour(application).

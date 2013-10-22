@@ -1,3 +1,4 @@
+% @private
 -module(http_signatures_server).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).

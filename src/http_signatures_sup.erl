@@ -1,3 +1,4 @@
+% @private
 -module(http_signatures_sup).
 
 -behaviour(supervisor).
