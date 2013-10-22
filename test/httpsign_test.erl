@@ -1,4 +1,4 @@
--module(http_signatures_test).
+-module(httpsign_test).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -10,19 +10,19 @@ rsa_sha_test() ->
 
   application:start(crypto),
   application:start(asn1),
-  application:start(http_signatures),
+  application:start(httpsign),
   
-  ok = http_signatures:register_key(?RSA_KEY, sha256, PemBin),
+  ok = httpsign:register_key(?RSA_KEY, sha256, PemBin),
 
-  ?assertNot(http_signatures:is_signed_response(AResponse)),
+  ?assertNot(httpsign:is_signed_response(AResponse)),
 
-  SignedResponse = http_signatures:get_signed_response(AResponse, ?RSA_KEY),
+  SignedResponse = httpsign:get_signed_response(AResponse, ?RSA_KEY),
 
-  ?assert(http_signatures:is_signed_response(SignedResponse)),
+  ?assert(httpsign:is_signed_response(SignedResponse)),
   
   AlteredResponse = replace_something_in_signature(SignedResponse),
 
-  ?assertNot(http_signatures:is_signed_response(AlteredResponse)).
+  ?assertNot(httpsign:is_signed_response(AlteredResponse)).
 
 
 get_fixture(FileName) ->

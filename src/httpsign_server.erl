@@ -1,5 +1,5 @@
 % @private
--module(http_signatures_server).
+-module(httpsign_server).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
 

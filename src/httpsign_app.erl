@@ -1,5 +1,5 @@
 % @private
--module(http_signatures_app).
+-module(httpsign_app).
 
 -behaviour(application).
 
@@ -11,7 +11,7 @@
 %% ===================================================================
 
 start(_StartType, _) ->
-  http_signatures_sup:start_link().
+  httpsign_sup:start_link().
 
 stop(_State) ->
   ok.
